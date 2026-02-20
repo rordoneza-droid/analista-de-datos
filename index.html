@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Analytics Dashboard | Costo 0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- Sidebar de Navegación por Áreas -->
+    <aside class="sidebar">
+      <h2 style="font-size: 1.2rem; margin-bottom: 1rem; font-weight: 700;">📊 ANALÍTICA PRO</h2>
+      <nav id="area-list">
+        <div class="area-item active" data-area="global">🌐 Consolidado Global</div>
+        <!-- Se llenará dinámicamente -->
+      </nav>
+
+      <div style="margin-top: auto;">
+        <button id="btn-config" class="area-item" style="width: 100%; border: none; background: transparent;">⚙️
+          Configuración</button>
+        <div id="user-info" style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted);"></div>
+      </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+      <header class="header">
+        <div>
+          <h1 id="current-area-title">Consolidado Global</h1>
+          <p style="color: var(--text-muted);">Resumen de toda la Big Data</p>
+        </div>
+        <div id="google-login-container"></div>
+      </header>
+
+      <!-- Barra de Filtros Avanzados -->
+      <div class="glass-card"
+        style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; background: rgba(255,255,255,0.03); margin-bottom: 2rem;">
+        <div class="filter-group">
+          <label style="font-size: 0.7rem; color: var(--text-muted); display: block;">Rango de Fecha</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="date" id="date-start" class="filter-input">
+            <input type="date" id="date-end" class="filter-input">
+          </div>
+        </div>
+        <div class="filter-group">
+          <label style="font-size: 0.7rem; color: var(--text-muted); display: block;">Comparar periodo</label>
+          <select id="compare-mode" class="filter-input">
+            <option value="none">Sin Comparativa</option>
+            <option value="month">Mes vs Mes Prev</option>
+            <option value="quarter">Trimestre vs Trimestre</option>
+          </select>
+        </div>
+        <div class="filter-group" style="flex: 1;">
+          <label style="font-size: 0.7rem; color: var(--text-muted); display: block;">Variable Específica</label>
+          <select id="variable-filter" class="filter-input" style="width: 100%;">
+            <option value="all">Todas las variables</option>
+          </select>
+        </div>
+        <button id="btn-apply-filters"
+          style="padding: 0.75rem 1.5rem; background: var(--primary); border: none; border-radius: 0.5rem; color: white; cursor: pointer; align-self: flex-end;">Aplicar
+          Filtros</button>
+      </div>
+
+      <!-- Grid de Estadísticas Rápidas -->
+      <div class="stats-grid">
+        <div class="glass-card">
+          <span style="color: var(--text-muted); font-size: 0.9rem;">Total Registros</span>
+          <h3 id="stat-total" style="font-size: 1.8rem;">0</h3>
+        </div>
+        <div class="glass-card">
+          <span style="color: var(--text-muted); font-size: 0.9rem;">Áreas Detectadas</span>
+          <h3 id="stat-areas" style="font-size: 1.8rem;">0</h3>
+        </div>
+        <div class="glass-card">
+          <span style="color: var(--text-muted); font-size: 0.9rem;">Libros Vinculados</span>
+          <h3 id="stat-books" style="font-size: 1.8rem;">5</h3>
+        </div>
+      </div>
+
+      <!-- Gráficos -->
+      <div class="glass-card" style="flex: 1;">
+        <canvas id="mainChart"></canvas>
+      </div>
+    </main>
+
+    <!-- Asistente de IA -->
+    <section class="ai-assistant">
+      <div style="padding: 1.5rem; border-bottom: 1px solid var(--border);">
+        <h3 style="display: flex; align-items: center; gap: 0.5rem;">✨ Smart Insights</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">Asistente IA Gemini</p>
+      </div>
+      <div id="chat-messages"
+        style="flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem;">
+        <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; font-size: 0.9rem;">
+          ¡Hola! Soy tu asistente de datos. ¿Qué quieres saber sobre el área de despacho hoy?
+        </div>
+      </div>
+      <div style="padding: 1rem; border-top: 1px solid var(--border);">
+        <input type="text" id="ai-input" placeholder="Pregunta algo sobre tus datos..."
+          style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: white; outline: none;">
+      </div>
+    </section>
+  </div>
+
+  <!-- Modales de Configuración -->
+  <div id="modal-config"
+    style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 100; align-items: center; justify-content: center;">
+    <div class="glass-card" style="width: 90%; max-width: 500px;">
+      <h2>⚙️ Configuración del Ecosistema</h2>
+      <p style="margin: 1rem 0; font-size: 0.9rem; color: var(--text-muted);">Gestiona los enlaces de tus Google Sheets
+        y accesos.</p>
+      <textarea id="sheet-links"
+        style="width: 100%; height: 150px; background: rgba(0,0,0,0.2); color: white; border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.5rem;"></textarea>
+      <div style="margin-top: 1rem; display: flex; gap: 1rem; justify-content: flex-end;">
+        <button id="close-config"
+          style="padding: 0.5rem 1rem; border: none; background: transparent; color: white; cursor: pointer;">Cerrar</button>
+        <button id="save-config"
+          style="padding: 0.5rem 1rem; border: none; background: var(--primary); color: white; border-radius: 0.5rem; cursor: pointer;">Guardar
+          Todo</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
